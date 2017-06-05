@@ -1,4 +1,4 @@
-*/ One of sample arduino projects for intro to arduinos
+/* One of sample arduino projects for intro to arduinos
 
 Diagram located at: witAdmin/arduinoProjects/intro/LED-Dimmer.jpg
 
