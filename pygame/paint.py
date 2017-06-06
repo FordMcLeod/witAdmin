@@ -7,7 +7,8 @@ drawing = False
 erased = False
 brush_radius = 10
 brush_center = (0,0)
-pygame
+
+
 pygame.init() # initalizes the pygame module
 title = 'Paint'
 size = (1000,1000)
@@ -20,8 +21,8 @@ while True:
     if event.type == QUIT:
         break
     elif event.type == MOUSEBUTTONDOWN:
+        brush_center = event.pos 
         color = (random.randrange(256),random.randrange(256),random.randrange(256))
-        brush_center = event.pos # place brush center where mouse is
         pygame.draw.circle(display,color,brush_center,brush_radius)
         drawing = True
     elif event.type == MOUSEBUTTONUP:
