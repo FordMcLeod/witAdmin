@@ -1,3 +1,5 @@
+# finished paint code with some extensions built into it
+
 import pygame
 import time
 import random
