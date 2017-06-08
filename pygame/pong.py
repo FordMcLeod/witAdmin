@@ -1,139 +1,176 @@
-# Code references: http://www.pygame.org/project-Very+simple+Pong+game-816-.html
+# Original code credits https://gist.github.com/vinothpandian/4337527
+# Pong Code for Pygame advanced challenge
 
 
-# Import things we need for our pong game
-import pygame
+
 import random
+import pygame, sys
 from pygame.locals import *
 
-pygame.init()                                          # Initalize pygame module
-pygame.font.init()                                     # Initialize font features for text
 
-screen = pygame.display.set_mode((640,480),0,0)        # set screen size
-pygame.display.set_caption("Pong!!!!!")                # create title for game
-
-# Create background
-back = pygame.Surface((640,480))                       # create surface for background
-background = back.convert()                            # convert surface for easier rendering
-background.fill(pygame.Color('black'))                 # fill background with desired color
-
-# create the padddles/bars 
-bar = pygame.Surface((10,50))                          # create surface for bar
-bar1 = bar.convert()                                  
-bar_color = pygame.Color('white')                      
-bar1.fill(bar_color)                                   # colour player 1's bar with desired colour
-bar2 = bar.convert()
-bar2.fill(bar_color)                                   # colour player 2's bar with desired colour
-
-# create the ball
-circ_surface = pygame.Surface((15,15))   
-ball_color = pygame.Color('orange')
-circ = pygame.draw.circle(circ_surface,ball_color,(15//2,15//2),15//2)
-ball = circ_surface.convert()
-ball.set_colorkey((0,0,0))
-score_color = pygame.Color('white')
-
-# set speed and location of both player's paddles and the ball
-bar1_location = [10,215]                      # location of player1's bar with x,y coordinates
-bar2_location = [620,21]                      # location of player2's bar with x,y coordinates
-score = [0,0]                                 # the score of both players
-movement = [0,0]                              # movement of bar with x,y coordinates
-ball_location = [307.5,232.5]                 # location of the ball with x,y coordinates
-ball_speed = [250, 250, 250]                  # speed of the ball with x,y coordinates and the last option being AI's
-
-#clock and font objects
-clock = pygame.time.Clock()                   # need clock for frame movement (frames per second)
-font = pygame.font.SysFont("calibri",40)      # pick font for scores
-
-# aesthetic features of game
-frame_rectobject = Rect((5,5),(630,470))
+pygame.init()
+fps = pygame.time.Clock()
 
 
+# define colors in rgb format
+WHITE = (255,255,255)
+RED = (255,0,0)
+GREEN = (0,255,0)
+BLACK = (0,0,0)
+# ---------------------------#
+
+WIDTH = 600
+HEIGHT = 400       
+BALL_RADIUS = 20
+PAD_WIDTH = 8
+PAD_HEIGHT = 80
+HALF_PAD_WIDTH = PAD_WIDTH // 2
+HALF_PAD_HEIGHT = PAD_HEIGHT // 2
+ball_pos = [0,0]
+ball_vel = [0,0]
+paddle1_vel = 0
+paddle2_vel = 0
+l_score = 0
+r_score = 0
+
+
+display = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)         # create the display for the game with given size
+pygame.display.set_caption('Pong!!!!!!')                          # set the title of the game
+
+
+# helper function that spawns a ball, returns a position vector and a velocity vector
+# if right is True, spawn to the right, else spawn to the left
+def ball_init(right):
+    global ball_pos, ball_vel # these are vectors stored as lists
+    ball_pos = [WIDTH//2,HEIGHT//2]
+    horz = random.randrange(2,4)
+    vert = random.randrange(1,3)
+    
+    if right == False:
+        horz = - horz
+        
+    ball_vel = [horz,-vert]
+
+# define event handlers
+def init():
+    global paddle1_pos, paddle2_pos, paddle1_vel, paddle2_vel,l_score,r_score  # these are floats
+    global score1, score2  # these are ints
+    paddle1_pos = [HALF_PAD_WIDTH - 1,HEIGHT//2]
+    paddle2_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT//2]
+    l_score = 0
+    r_score = 0
+    if random.randrange(0,2) == 0:
+        ball_init(True)
+    else:
+        ball_init(False)
+
+
+#draw function of canvas
+def draw(canvas):
+    global paddle1_pos, paddle2_pos, ball_pos, ball_vel, l_score, r_score
+           
+    canvas.fill(BLACK)
+    pygame.draw.line(canvas, WHITE, [WIDTH // 2, 0],[WIDTH // 2, HEIGHT], 1)
+    pygame.draw.line(canvas, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.line(canvas, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.circle(canvas, WHITE, [WIDTH //2, HEIGHT//2], 70, 1)
+
+    # update paddle's vertical position, keep paddle on the screen
+    if paddle1_pos[1] > HALF_PAD_HEIGHT and paddle1_pos[1] < HEIGHT - HALF_PAD_HEIGHT:
+        paddle1_pos[1] += paddle1_vel
+    elif paddle1_pos[1] == HALF_PAD_HEIGHT and paddle1_vel > 0:
+        paddle1_pos[1] += paddle1_vel
+    elif paddle1_pos[1] == HEIGHT - HALF_PAD_HEIGHT and paddle1_vel < 0:
+        paddle1_pos[1] += paddle1_vel
+    
+    if paddle2_pos[1] > HALF_PAD_HEIGHT and paddle2_pos[1] < HEIGHT - HALF_PAD_HEIGHT:
+        paddle2_pos[1] += paddle2_vel
+    elif paddle2_pos[1] == HALF_PAD_HEIGHT and paddle2_vel > 0:
+        paddle2_pos[1] += paddle2_vel
+    elif paddle2_pos[1] == HEIGHT - HALF_PAD_HEIGHT and paddle2_vel < 0:
+        paddle2_pos[1] += paddle2_vel
+
+    #update ball
+    ball_pos[0] += int(ball_vel[0])
+    ball_pos[1] += int(ball_vel[1])
+
+    #draw paddles and ball
+    pygame.draw.circle(canvas, RED, ball_pos, 20, 0)
+    pygame.draw.polygon(canvas, GREEN, [[paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT], [paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] + HALF_PAD_HEIGHT], [paddle1_pos[0] + HALF_PAD_WIDTH, paddle1_pos[1] + HALF_PAD_HEIGHT], [paddle1_pos[0] + HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT]], 0)
+    pygame.draw.polygon(canvas, GREEN, [[paddle2_pos[0] - HALF_PAD_WIDTH, paddle2_pos[1] - HALF_PAD_HEIGHT], [paddle2_pos[0] - HALF_PAD_WIDTH, paddle2_pos[1] + HALF_PAD_HEIGHT], [paddle2_pos[0] + HALF_PAD_WIDTH, paddle2_pos[1] + HALF_PAD_HEIGHT], [paddle2_pos[0] + HALF_PAD_WIDTH, paddle2_pos[1] - HALF_PAD_HEIGHT]], 0)
+
+    #ball collision check on top and bottom walls
+    if int(ball_pos[1]) <= BALL_RADIUS:
+        ball_vel[1] = - ball_vel[1]
+    if int(ball_pos[1]) >= HEIGHT + 1 - BALL_RADIUS:
+        ball_vel[1] = -ball_vel[1]
+    
+    #ball collison check on gutters or paddles
+    if int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH and int(ball_pos[1]) in range(paddle1_pos[1] - HALF_PAD_HEIGHT,paddle1_pos[1] + HALF_PAD_HEIGHT,1):
+        ball_vel[0] = -ball_vel[0]
+        ball_vel[0] *= 1.1
+        ball_vel[1] *= 1.1
+    elif int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH:
+        r_score += 1
+        ball_init(True)
+        
+    if int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH and int(ball_pos[1]) in range(paddle2_pos[1] - HALF_PAD_HEIGHT,paddle2_pos[1] + HALF_PAD_HEIGHT,1):
+        ball_vel[0] = -ball_vel[0]
+        ball_vel[0] *= 1.1
+        ball_vel[1] *= 1.1
+    elif int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH:
+        l_score += 1
+        ball_init(False)
+
+    #update scores
+    myfont1 = pygame.font.SysFont("Comic Sans MS", 20)
+    label1 = myfont1.render("Score "+str(l_score), 1, (255,255,0))
+    canvas.blit(label1, (50,20))
+
+    myfont2 = pygame.font.SysFont("Comic Sans MS", 20)
+    label2 = myfont2.render("Score "+str(r_score), 1, (255,255,0))
+    canvas.blit(label2, (470, 20))  
+    
+    
+
+def keydown(event):                           # function for when a player hits the down key
+    global paddle1_vel, paddle2_vel
+    
+    if event.key == K_UP:                     # if player 2 presses up key
+        paddle2_vel = -8                      # move paddle 2 up ** pygame coordinates start from (0,0) 
+    elif event.key == K_DOWN:                 # if player 2 presses down key
+        paddle2_vel = 8                       # move paddle 2 down 
+    elif event.key == K_w:                    # if player 1 presses 'w' key
+        paddle1_vel = -8                      # move paddle 1 up
+    elif event.key == K_s:                    # if player 1 presses 's' key
+        paddle1_vel = 8                       # move padle 1 down
+
+
+def keyup(event):
+    global paddle1_vel, paddle2_vel
+    
+    if event.key in (K_w, K_s):
+        paddle1_vel = 0
+    elif event.key in (K_UP, K_DOWN):
+        paddle2_vel = 0
+
+init()
+
+
+#game loop
 while True:
+
+    draw(display)
+
     event = pygame.event.poll()
-    if event.type == QUIT:
-        break
     if event.type == KEYDOWN:
-        if event.key == K_UP:
-            movement[1] = -ai_speed
-        elif event.key == K_DOWN:
-            movement[1] = ai_speed
+        keydown(event)
     elif event.type == KEYUP:
-        if event.key == K_UP:
-            movement[1] = 0
-        elif event.key == K_DOWN:
-            movement[1] = 0
+        keyup(event)
+    elif event.type == QUIT:
+        break
+            
+    pygame.display.update()
+    fps.tick(60)
     
-    score1 = font.render(str(score[0]),True,score_color)
-    score2 = font.render(str(score[1]),True,score_color)
-
-    screen.blit(background,(0,0))
-    frame = pygame.draw.rect(screen,pygame.Color('white'),frame_rectobject,2)
-    middle_line = pygame.draw.aaline(screen,(255,255,255),(330,5),(330,475))
-    screen.blit(bar1,bar1_location)
-    screen.blit(bar2,bar2_location)
-    screen.blit(ball,ball_location)
-    screen.blit(score1,(250,210))
-    screen.blit(score2,(380,210))
-
-    bar1_location[1] += movement[1]
-    
-# movement of ball
-    time_passed = clock.tick(60)
-    time_sec = time_passed / 1000.0
-    
-    ball_location[0] += ball_speed[0] * time_sec
-    ball_location[1] += ball_speed[1] * time_sec
-    ai_speed = ball_speed[2] * time_sec
-    
-    
-#AI of the computer.
-    if ball_location[0] >= 305.:
-        if not bar2_location[1] == ball_location[1] + 7.5:
-            if bar2_location[1] < ball_location[1] + 7.5:
-                bar2_location[1] += ai_speed
-            if  bar2_location[1] > ball_location[1] - 42.5:
-                bar2_location[1] -= ai_speed
-        else:
-            bar2_location[1] == ball_location[1] + 7.5
-    
-    if bar1_location[1] >= 420: 
-        bar1_location[1] = 420
-    elif bar1_location[1] <= 10: 
-        bar1_location[1] = 10
-    if bar2_location[1] >= 420:
-        bar2_location[1] = 420
-    elif bar2_location[1] <= 10: 
-        bar2_location[1] = 10.
-    
-    
-    
-# collisions based on the size of the display
-    if ball_location[0] <= bar1_location[0] + 10.:
-        if ball_location[1] >= bar1_location[1] - 7.5 and ball_location[1] <= bar1_location[1] + 42.5:
-            ball_location[0] = 20
-            ball_speed[0] = -ball_speed[0]
-    if ball_location[0] >= bar2_location[0] - 15:
-        if ball_location[1] >= bar2_location[1] - 7.5 and ball_location[1] <= bar2_location[1] + 42.5:
-            ball_location[0] = 605.
-            ball_speed[0] = -ball_speed[0]
-    if ball_location[0] < 5:
-        score[1] += 1
-        ball_location = [320,232.5]
-        bar1_location[1] = 215
-        bar2_location[1] = 215
-    elif ball_location[0] > 620:
-        score[0] += 1
-        ball_location =[320,232.5]
-        bar1_location[1] = 215
-        bar2_location[1] = 215        
-    if ball_location[1] <= 10:
-        ball_speed[1] = -ball_speed[1]
-        ball_location[1] = 10.
-    elif ball_location[1] >= 457.5:
-        ball_speed[1] = -ball_speed[1]
-        ball_location[1] = 457.5
-
-    pygame.display.update()                 
-
 pygame.display.quit()
