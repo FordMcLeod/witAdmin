@@ -14,10 +14,9 @@ def main():
             break
     print('Let your adventure begin\n')
     
-    dungeon(power) # call next level's function here and add our power argument here so the next function can access it
+    dungeon() 
         
-        
-def dungeon(power): # here is a parameter we put in so we can access power from the main function
+def dungeon(): 
     print("Where am I? This forest is so largely dense in trees but at least it's quiet and peaceful in here")
     time.sleep(2)
     print("Ahh I see a zombie looking person over there")
@@ -26,7 +25,7 @@ def dungeon(power): # here is a parameter we put in so we can access power from 
     while True:
         action = input('Should I use my powers or flee? (type in powers or flee)')
         if action == 'powers':
-            print('Time to attack with my superpower of ' + power)
+            print('Time to attack with my superpowers')          
             print('Uh oh this zombie is too strong!!!')
             print('The hero is now gone')
             break                                                # end of game for this path
