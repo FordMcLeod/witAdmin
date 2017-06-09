@@ -35,12 +35,9 @@ while True:                     # game loop that goes on forever until user clic
         brush_center = event.pos                                    # place brush's center where the mouse pointer is
         pygame.draw.circle(display,color,brush_center,brush_radius) # draw circle on screen
         drawing = True                                              # keep on drawing
+        
     elif event.type == MOUSEBUTTONUP:
         drawing = False                                             # stop drawing
-    
-    elif event.type == MOUSEMOTION:
-        if drawing:                                                 # if the mouse button is down,
-            pygame.draw.circle(display,color,event.pos,brush_radius)# draw circle on screen  
     
     elif event.type == KEYDOWN:                         # if we hold a key down
         if event.key == K_BACKSPACE :                   # if we press the backspace key 
@@ -51,5 +48,6 @@ while True:                     # game loop that goes on forever until user clic
     
     
     pygame.display.update()     # update the game every iteration
+    
 pygame.display.quit()           # quit game
 
