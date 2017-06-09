@@ -1,0 +1,16 @@
+#define np    370
+#define na    415
+#define no    330
+#define ny    247
+#define nu    277
+#define nd    494
+#define n0   139
+#define nQ    156
+#define nw    165
+#define nr    208
+#define n1   55
+#define n2   62
+#define n3   69
+#define n6   93
+#define n8   110
+#define n9   123
