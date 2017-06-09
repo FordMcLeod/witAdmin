@@ -8,6 +8,7 @@ import random
 
 pygame.init()                       # initialize pygame module
 clock = pygame.time.Clock()         # initalize clock for frames per second
+pygame.font.init()
 
 # game variables---#
 display_width = 800
@@ -27,9 +28,14 @@ pygame.display.set_caption('Game')
 # color codes
 black = (0,0,0)
 white = (255,255,255)
+green = (0,255,0)
 
 pygame.key.set_repeat(20,20)
 carImg = pygame.image.load('racecar.png') # load an image from our current directory
+
+
+def obstacles(x, y, w, h, color):
+    pygame.draw.rect(display, color, pygame.Rect(x, y, w, h))
 
 def car(x,y):                         # function for creating the car that takes x,y coordinates
     display.blit(carImg, (x,y))       # place car onto display
@@ -45,11 +51,19 @@ def crash():
     pygame.display.update()
     time.sleep(3)                                               # pause for 3 seconds before game quits
     return None                                                 # return None to help with quitting game
+    
 
 def game():
     global x,y,x_change,display_width,car_width
     
-    collided = False
+    # obstacle variables
+    startx = random.randrange(0, display_width)   # start position is random based on screen width size
+    starty = -600                                 
+    o_speed = 7
+    o_width = 100
+    o_height = 100
+    dodged = 0
+    # ---------
     
     while True:
         event = pygame.event.poll()       # takes a pygame event
@@ -70,8 +84,30 @@ def game():
         display.fill(white)              # fill screen with background color
         car(x,y)                         # call car function to create it
         
+        obstacles(startx, starty, o_width, o_height, green) # create obstacles
+        starty += o_speed                                   # move obstacles by their speed
+        
         if x > display_width - car_width or x < 0: # car collision
-            collided = True    
+            result = crash()                       # call function to start crash sequence
+            if result == None:                     # have this just so we can quit game afterwards
+                break
+            
+            
+        
+        if starty > display_height:
+            starty = 0 - o_height
+            startx = random.randrange(0,display_width)
+            dodged += 1
+            o_speed += 1
+            o_width += (dodged * 1.2)
+            
+        if y < starty + o_height:
+            if x > startx and x < startx + o_width or x + car_width > startx and x + car_width < startx + o_width:
+                result = crash()
+                if result == None:
+                    break 
+                
+    
     
         pygame.display.update()          # update display after every iteration
         clock.tick(60)                   # frames per second
