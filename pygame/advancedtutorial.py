@@ -8,6 +8,7 @@ import random
 
 pygame.init()                       # initialize pygame module
 clock = pygame.time.Clock()         # initalize clock for frames per second
+pygame.font.init()
 
 # game variables---#
 display_width = 800
