@@ -1,5 +1,5 @@
 # credits: https://www.nostarch.com/teachkids/#content
-# extentions: make 2 player games, change color of paddles, change controls for how it moves
+# extentions: create lives, make 2 player games, change color of paddles, change controls for how it moves
 # change image and music
 
 
@@ -38,7 +38,6 @@ while keepGoing:    # Game loop
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:    # F1 = New Game
                 points = 0
-                lives = 5
                 picx = 0
                 picy = 0
                 speedx = 5
@@ -71,13 +70,7 @@ while keepGoing:    # Game loop
             points += 1
             
     # Draw text on screen
-    draw_string = "Lives: " + str(lives) + " Points: " + str(points)
-    
-    # Check whether the game is over
-    if lives < 1:   
-        speedx = speedy = 0
-        draw_string = "Game Over. Your score was: " + str(points)
-        draw_string += ". Press F1 to play again. "
+    draw_string = "Points: " + str(points)
         
     text = font.render(draw_string, True, WHITE)
     text_rect = text.get_rect()
