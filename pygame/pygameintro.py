@@ -1,3 +1,6 @@
+# references: http://inventwithpython.com/pygame/chapter2.html
+
+
 # all the things we need to code this
 import pygame 
 import time
@@ -14,11 +17,7 @@ display = pygame.display.set_mode(size,0,0)    # creates window
 pygame.display.set_caption(title)              # creates title of game
 # game setup --------------#
 
-
-x = 30
-y = 30 
 clock = pygame.time.Clock()
-pygame.key.set_repeat(20, 20)
 
 
 # draws 4 different rectangles with different colors and locations
@@ -31,6 +30,11 @@ font = pygame.font.SysFont("comicsans",50)              # use a font from the py
 text = font.render("WOOOO THIS WORKS!!!",1,(255,255,0)) # draw text on a seperate font surface with text,color features
 display.blit(text,(100, 100))                           # place text onto display at a location
 
+cat = pygame.image.load('cat.png')
+catx = 10
+caty = 10
+direction = 'right'
+
 
 
 while True:                     # game loop that goes on forever until user clicks close button
@@ -38,25 +42,27 @@ while True:                     # game loop that goes on forever until user clic
     if event.type == QUIT:      # if user clicks the close button
         break                   # get out of game loop
     
+    display.fill(pygame.Color('white')) # fill display with background color
     
-    # ***** can comment out lines 44-57 to demo the text and rectangle drawing before the while loop
-    
-    elif event.type == KEYDOWN:             # if user holds down key
-        if event.key == K_LEFT:             # if user hits left key
-            x -= 3                          # move rectangle to the left             
-        elif event.key == K_RIGHT:          # if user hits right key
-            x += 3                          # move rectangle to the right
-        elif event.key == K_UP:             # if user hits up key
-            y -= 3                          # move rectangle up (remmeber that in pygame (0,0) starts at top left
-        elif event.key == K_DOWN:           # if user hits up key
-            y += 3                          # move rectangle down
+    if direction == 'right':
+        catx += 5
+        if catx == 280:
+            direction = 'down'
+    elif direction == 'down':
+        caty += 5
+        if caty == 220:
+            direction = 'left'
+    elif direction == 'left':
+        catx -= 5
+        if catx == 10:
+            direction = 'up'
+    elif direction == 'up':
+        caty -= 5
+        if caty == 10:
+            direction = 'right'    
 
-    
-    display.fill(pygame.Color('black'))                                 # fill display with background color
-    pygame.draw.rect(display,(255, 0, 255), pygame.Rect(x,y,60,60))     # draw rectangle depending on x,y location
-    clock.tick(60)                                                      # pause for 1 seconds in between drawing frames (like frames per second)
-
-
+    display.blit(cat,(catx,caty))     # place image on display with location
+    clock.tick(30)                    # control speed of game using frames per second
     pygame.display.update()
 
 pygame.display.quit()
